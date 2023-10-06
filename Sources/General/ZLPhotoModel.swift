@@ -27,6 +27,12 @@
 import UIKit
 import Photos
 
+
+public class ZLCameraAssetMode : NSObject {
+    var image : UIImage?
+    var videoURL : URL?
+}
+
 public extension ZLPhotoModel {
     
     enum MediaType: Int {
@@ -44,7 +50,7 @@ public class ZLPhotoModel: NSObject {
     public var ident: String
     public var isAsset : Bool
     public let asset: PHAsset?
-
+    public var cameraAsset : ZLCameraAssetMode?
     public var type: ZLPhotoModel.MediaType = .unknown
     
     public var duration: String = ""
@@ -108,12 +114,19 @@ public class ZLPhotoModel: NSObject {
     // Content of the last edit.
     public var editImageModel: ZLEditImageModel?
     
+    
+    public init(image : UIImage?, url : URL?) {
+        ident =  UUID().uuidString
+        isAsset = false
+        self.asset = nil
+        super.init()
+    }
+    
     public init(asset: PHAsset?) {
         ident =  UUID().uuidString
         self.asset = asset
         self.isAsset = asset != nil
         super.init()
-        
         if let asset = self.asset {
             ident = asset.localIdentifier
             type = transformAssetType(for: asset)
@@ -121,8 +134,6 @@ public class ZLPhotoModel: NSObject {
                 duration = transformDuration(for: asset)
             }
         }
-        
-
     }
     
     public func transformAssetType(for asset: PHAsset) -> ZLPhotoModel.MediaType {

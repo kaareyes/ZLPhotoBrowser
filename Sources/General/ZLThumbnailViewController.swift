@@ -794,6 +794,7 @@ class ZLThumbnailViewController: UIViewController {
             let camera = ZLCustomCamera()
             camera.takeDoneBlock = { [weak self] image, videoUrl in
                 guard let self = self else {return}
+                
                 self.save(image: image, videoUrl: videoUrl)
             }
             showDetailViewController(camera, sender: nil)
@@ -829,26 +830,34 @@ class ZLThumbnailViewController: UIViewController {
     }
     
     private func save(image: UIImage?, videoUrl: URL?) {
-        if let image = image {
-            let hud = ZLProgressHUD.show(toast: .processing)
-            ZLPhotoManager.saveImageToAlbum(image: image) { [weak self] suc, asset in
-                hud.hide()
-                if suc, let at = asset {
-                    let model = ZLPhotoModel(asset: at)
-                    self?.handleDataArray(newModel: model)
-                } else {
-                    showAlertView(localLanguageTextValue(.saveImageError), self)
+        
+        let config = ZLPhotoConfiguration.default()
+        
+        if config.dontSaveCameraCapture {
+            let model = ZLPhotoModel(image: image, url: videoUrl)
+            self.handleDataArray(newModel: model)
+        }else{
+            if let image = image {
+                let hud = ZLProgressHUD.show(toast: .processing)
+                ZLPhotoManager.saveImageToAlbum(image: image) { [weak self] suc, asset in
+                    hud.hide()
+                    if suc, let at = asset {
+                        let model = ZLPhotoModel(asset: at)
+                        self?.handleDataArray(newModel: model)
+                    } else {
+                        showAlertView(localLanguageTextValue(.saveImageError), self)
+                    }
                 }
-            }
-        } else if let videoUrl = videoUrl {
-            let hud = ZLProgressHUD.show(toast: .processing)
-            ZLPhotoManager.saveVideoToAlbum(url: videoUrl) { [weak self] suc, asset in
-                hud.hide()
-                if suc, let at = asset {
-                    let model = ZLPhotoModel(asset: at)
-                    self?.handleDataArray(newModel: model)
-                } else {
-                    showAlertView(localLanguageTextValue(.saveVideoError), self)
+            } else if let videoUrl = videoUrl {
+                let hud = ZLProgressHUD.show(toast: .processing)
+                ZLPhotoManager.saveVideoToAlbum(url: videoUrl) { [weak self] suc, asset in
+                    hud.hide()
+                    if suc, let at = asset {
+                        let model = ZLPhotoModel(asset: at)
+                        self?.handleDataArray(newModel: model)
+                    } else {
+                        showAlertView(localLanguageTextValue(.saveVideoError), self)
+                    }
                 }
             }
         }
@@ -884,7 +893,9 @@ class ZLThumbnailViewController: UIViewController {
             if !shouldDirectEdit(newModel) {
                 newModel.isSelected = true
                 nav?.arrSelectedModels.append(newModel)
-                config.didSelectAsset?(newModel.asset!)
+                if let asset = newModel.asset {
+                    config.didSelectAsset?(asset)
+                }
                 
                 if config.callbackDirectlyAfterTakingPhoto {
                     doneBtnClick()
