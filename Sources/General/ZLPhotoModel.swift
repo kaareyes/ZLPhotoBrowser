@@ -41,9 +41,9 @@ public extension ZLPhotoModel {
 
 public class ZLPhotoModel: NSObject {
     
-    public let ident: String
-    
-    public let asset: PHAsset
+    public var ident: String
+    public var isAsset : Bool
+    public let asset: PHAsset?
 
     public var type: ZLPhotoModel.MediaType = .unknown
     
@@ -54,6 +54,7 @@ public class ZLPhotoModel: NSObject {
     private var pri_dataSize: ZLPhotoConfiguration.KBUnit?
     
     public var dataSize: ZLPhotoConfiguration.KBUnit? {
+        guard let asset = self.asset else {return 0.0}
         if let pri_dataSize = pri_dataSize {
             return pri_dataSize
         }
@@ -80,13 +81,14 @@ public class ZLPhotoModel: NSObject {
     }
     
     public var second: ZLPhotoConfiguration.Second {
-        guard type == .video else {
+        guard type == .video, let asset = self.asset else {
             return 0
         }
         return Int(round(asset.duration))
     }
     
     public var whRatio: CGFloat {
+        guard let asset = self.asset else {return 0.0}
         return CGFloat(asset.pixelWidth) / CGFloat(asset.pixelHeight)
     }
     
@@ -106,15 +108,21 @@ public class ZLPhotoModel: NSObject {
     // Content of the last edit.
     public var editImageModel: ZLEditImageModel?
     
-    public init(asset: PHAsset) {
-        ident = asset.localIdentifier
+    public init(asset: PHAsset?) {
+        ident =  UUID().uuidString
         self.asset = asset
+        self.isAsset = asset != nil
         super.init()
         
-        type = transformAssetType(for: asset)
-        if type == .video {
-            duration = transformDuration(for: asset)
+        if let asset = self.asset {
+            ident = asset.localIdentifier
+            type = transformAssetType(for: asset)
+            if type == .video {
+                duration = transformDuration(for: asset)
+            }
         }
+        
+
     }
     
     public func transformAssetType(for asset: PHAsset) -> ZLPhotoModel.MediaType {

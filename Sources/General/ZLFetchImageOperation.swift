@@ -115,7 +115,7 @@ class ZLFetchImageOperation: Operation {
         }
         
         if ZLPhotoConfiguration.default().allowSelectGif, model.type == .gif {
-            requestImageID = ZLPhotoManager.fetchOriginalImageData(for: model.asset) { [weak self] data, _, isDegraded in
+            requestImageID = ZLPhotoManager.fetchOriginalImageData(for: model.asset!) { [weak self] data, _, isDegraded in
                 if !isDegraded {
                     let image = UIImage.zl.animateGifImage(data: data)
                     self?.completion(image, nil)
@@ -126,7 +126,7 @@ class ZLFetchImageOperation: Operation {
         }
         
         if isOriginal {
-            requestImageID = ZLPhotoManager.fetchOriginalImage(for: model.asset, progress: progress) { [weak self] image, isDegraded in
+            requestImageID = ZLPhotoManager.fetchOriginalImage(for: model.asset!, progress: progress) { [weak self] image, isDegraded in
                 if !isDegraded {
                     zl_debugPrint("---- 原图加载完成 \(String(describing: self?.isCancelled))")
                     self?.completion(image?.zl.fixOrientation(), nil)
@@ -134,7 +134,7 @@ class ZLFetchImageOperation: Operation {
                 }
             }
         } else {
-            requestImageID = ZLPhotoManager.fetchImage(for: model.asset, size: model.previewSize, progress: progress) { [weak self] image, isDegraded in
+            requestImageID = ZLPhotoManager.fetchImage(for: model.asset!, size: model.previewSize, progress: progress) { [weak self] image, isDegraded in
                 if !isDegraded {
                     zl_debugPrint("---- 加载完成 isCancelled: \(String(describing: self?.isCancelled))")
                     self?.completion(self?.scaleImage(image?.zl.fixOrientation()), nil)

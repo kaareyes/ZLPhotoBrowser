@@ -147,7 +147,7 @@ func showAlertController(title: String?, message: String?, style: ZLCustomAlertS
 func canAddModel(_ model: ZLPhotoModel, currentSelectCount: Int, sender: UIViewController?, showAlert: Bool = true) -> Bool {
     let config = ZLPhotoConfiguration.default()
     
-    guard config.canSelectAsset?(model.asset) ?? true else {
+    guard config.canSelectAsset?(model.asset!) ?? true else {
         return false
     }
     
@@ -214,7 +214,7 @@ func canAddModel(_ model: ZLPhotoModel, currentSelectCount: Int, sender: UIViewC
 func downloadAssetIfNeed(model: ZLPhotoModel, sender: UIViewController?, completion: @escaping (() -> Void)) {
     let config = ZLPhotoConfiguration.default()
     guard model.type == .video,
-          model.asset.zl.isInCloud,
+          model.asset!.zl.isInCloud,
           config.downloadVideoBeforeSelecting else {
         completion()
         return
@@ -229,7 +229,7 @@ func downloadAssetIfNeed(model: ZLPhotoModel, sender: UIViewController?, complet
         }
     }
 
-    requestAssetID = ZLPhotoManager.fetchVideo(for: model.asset, completion: { _, _, isDegraded in
+    requestAssetID = ZLPhotoManager.fetchVideo(for: model.asset!, completion: { _, _, isDegraded in
         hud.hide()
         
         if !isDegraded {

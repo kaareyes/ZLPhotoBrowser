@@ -537,7 +537,7 @@ class ZLPhotoPreviewController: UIViewController {
             nav.arrSelectedModels.removeAll { $0 == currentModel }
             selPhotoPreview?.removeSelModel(model: currentModel)
             
-            config.didDeselectAsset?(currentModel.asset)
+            config.didDeselectAsset?(currentModel.asset!)
             
             resetSubViewStatus()
         } else {
@@ -554,7 +554,7 @@ class ZLPhotoPreviewController: UIViewController {
                 nav.arrSelectedModels.append(currentModel)
                 self?.selPhotoPreview?.addSelModel(model: currentModel)
                 
-                config.didSelectAsset?(currentModel.asset)
+                config.didSelectAsset?(currentModel.asset!)
                 
                 self?.resetSubViewStatus()
             }
@@ -576,7 +576,7 @@ class ZLPhotoPreviewController: UIViewController {
         
         if model.type == .image || (!config.allowSelectGif && model.type == .gif) || (!config.allowSelectLivePhoto && model.type == .livePhoto) {
             hud.show(timeout: ZLPhotoConfiguration.default().timeout)
-            requestAssetID = ZLPhotoManager.fetchImage(for: model.asset, size: model.previewSize) { [weak self] image, isDegraded in
+            requestAssetID = ZLPhotoManager.fetchImage(for: model.asset!, size: model.previewSize) { [weak self] image, isDegraded in
                 if !isDegraded {
                     if let image = image {
                         self?.showEditImageVC(image: image)
@@ -589,7 +589,7 @@ class ZLPhotoPreviewController: UIViewController {
         } else if model.type == .video || config.allowEditVideo {
             hud.show(timeout: ZLPhotoConfiguration.default().timeout)
             // fetch avasset
-            requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset) { [weak self] avAsset, _ in
+            requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset!) { [weak self] avAsset, _ in
                 hud.hide()
                 if let avAsset = avAsset {
                     self?.showEditVideoVC(model: model, avAsset: avAsset)
@@ -656,7 +656,7 @@ class ZLPhotoPreviewController: UIViewController {
         
         downloadAssetIfNeed(model: currentModel, sender: self) { [weak nav] in
             nav?.arrSelectedModels.append(currentModel)
-            ZLPhotoConfiguration.default().didSelectAsset?(currentModel.asset)
+            ZLPhotoConfiguration.default().didSelectAsset?(currentModel.asset!)
             
             callBackBeforeDone()
         }
@@ -1182,7 +1182,7 @@ class ZLPhotoPreviewSelectedViewCell: UICollectionViewCell {
         if let ei = model.editImage {
             imageView.image = ei
         } else {
-            imageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: size, completion: { [weak self] image, _ in
+            imageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: size, completion: { [weak self] image, _ in
                 if self?.imageIdentifier == self?.model.ident {
                     self?.imageView.image = image
                 }

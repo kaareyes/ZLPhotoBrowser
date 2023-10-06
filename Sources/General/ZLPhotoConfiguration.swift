@@ -275,6 +275,11 @@ public class ZLPhotoConfiguration: NSObject {
     /// The first parameter is the current controller.
     /// The second parameter is the block that needs to be called after the user completes the operation.
     public var operateBeforeDoneAction: ((UIViewController, @escaping () -> Void) -> Void)?
+    
+    
+    
+    public var dontSaveCameraCapture = true
+
 }
 
 @objc public enum ZLNoAuthorityType: Int {

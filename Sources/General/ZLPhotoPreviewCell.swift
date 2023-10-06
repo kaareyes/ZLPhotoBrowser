@@ -400,7 +400,7 @@ class ZLLivePhotoPreviewCell: ZLPreviewBaseCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         livePhotoView.frame = bounds
-        resizeImageView(imageView: imageView, asset: model.asset)
+        resizeImageView(imageView: imageView, asset: model.asset!)
     }
     
     override func previewVCScroll() {
@@ -435,8 +435,8 @@ class ZLLivePhotoPreviewCell: ZLPreviewBaseCell {
         size.width /= 4
         size.height /= 4
         
-        resizeImageView(imageView: imageView, asset: model.asset)
-        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: size, completion: { [weak self] image, _ in
+        resizeImageView(imageView: imageView, asset: model.asset!)
+        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: size, completion: { [weak self] image, _ in
             self?.imageView.image = image
         })
     }
@@ -456,7 +456,7 @@ class ZLLivePhotoPreviewCell: ZLPreviewBaseCell {
         onFetchingLivePhoto = true
         fetchLivePhotoDone = false
         
-        livePhotoRequestID = ZLPhotoManager.fetchLivePhoto(for: model.asset, completion: { livePhoto, _, isDegraded in
+        livePhotoRequestID = ZLPhotoManager.fetchLivePhoto(for: model.asset!, completion: { livePhoto, _, isDegraded in
             if !isDegraded {
                 self.fetchLivePhotoDone = true
                 self.livePhotoView.livePhoto = livePhoto
@@ -555,7 +555,7 @@ class ZLVideoPreviewCell: ZLPreviewBaseCell {
         super.layoutSubviews()
         
         playerLayer?.frame = bounds
-        resizeImageView(imageView: imageView, asset: model.asset)
+        resizeImageView(imageView: imageView, asset: model.asset!)
         let insets = deviceSafeAreaInsets()
         playBtn.frame = CGRect(x: 0, y: insets.top, width: bounds.width, height: bounds.height - insets.top - insets.bottom)
         syncErrorLabel.frame = CGRect(x: 10, y: insets.top + 60, width: bounds.width - 20, height: 35)
@@ -613,14 +613,14 @@ class ZLVideoPreviewCell: ZLPreviewBaseCell {
         size.width /= 2
         size.height /= 2
         
-        resizeImageView(imageView: imageView, asset: model.asset)
-        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: size, completion: { image, _ in
+        resizeImageView(imageView: imageView, asset: model.asset!)
+        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: size, completion: { image, _ in
             self.imageView.image = image
         })
     }
     
     private func fetchVideo() {
-        videoRequestID = ZLPhotoManager.fetchVideo(for: model.asset, progress: { [weak self] progress, _, _, _ in
+        videoRequestID = ZLPhotoManager.fetchVideo(for: model.asset!, progress: { [weak self] progress, _, _, _ in
             self?.progressView.progress = progress
             zl_debugPrint("video progress \(progress)")
             if progress >= 1 {
@@ -958,7 +958,7 @@ class ZLPreviewView: UIView {
             imageView.image = editImage
             resetSubViewSize()
         } else {
-            imageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: requestPhotoSize(gif: false), progress: { [weak self] progress, _, _, _ in
+            imageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: requestPhotoSize(gif: false), progress: { [weak self] progress, _, _, _ in
                 self?.progressView.progress = progress
                 if progress >= 1 {
                     self?.progressView.isHidden = true
@@ -987,7 +987,7 @@ class ZLPreviewView: UIView {
             imageView.subviews.forEach { $0.removeFromSuperview() }
         }
         
-        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: requestPhotoSize(gif: true), completion: { [weak self] image, _ in
+        imageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: requestPhotoSize(gif: true), completion: { [weak self] image, _ in
             guard self?.imageIdentifier == self?.model.ident else {
                 return
             }
@@ -1010,7 +1010,7 @@ class ZLPreviewView: UIView {
         imageView.layer.speed = 1
         imageView.layer.timeOffset = 0
         imageView.layer.beginTime = 0
-        gifImageRequestID = ZLPhotoManager.fetchOriginalImageData(for: model.asset, progress: { [weak self] progress, _, _, _ in
+        gifImageRequestID = ZLPhotoManager.fetchOriginalImageData(for: model.asset!, progress: { [weak self] progress, _, _, _ in
             self?.progressView.progress = progress
             if progress >= 1 {
                 self?.progressView.isHidden = true
@@ -1042,7 +1042,7 @@ class ZLPreviewView: UIView {
             if let ei = model.editImage {
                 size = ei.size
             } else {
-                size = CGSize(width: model.asset.pixelWidth, height: model.asset.pixelHeight)
+                size = CGSize(width: model.asset!.pixelWidth, height: model.asset!.pixelHeight)
             }
         } else {
             size = imageView.image?.size ?? bounds.size

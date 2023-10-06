@@ -273,7 +273,7 @@ class ZLThumbnailPhotoCell: UICollectionViewCell {
         
         imageIdentifier = model.ident
         imageView.image = nil
-        smallImageRequestID = ZLPhotoManager.fetchImage(for: model.asset, size: size, completion: { [weak self] image, isDegraded in
+        smallImageRequestID = ZLPhotoManager.fetchImage(for: model.asset!, size: size, completion: { [weak self] image, isDegraded in
             if self?.imageIdentifier == self?.model.ident {
                 self?.imageView.image = image
             }
@@ -286,7 +286,7 @@ class ZLThumbnailPhotoCell: UICollectionViewCell {
     private func fetchBigImage() {
         cancelFetchBigImage()
         
-        bigImageReqeustID = ZLPhotoManager.fetchOriginalImageData(for: model.asset, progress: { [weak self] progress, _, _, _ in
+        bigImageReqeustID = ZLPhotoManager.fetchOriginalImageData(for: model.asset!, progress: { [weak self] progress, _, _, _ in
             if self?.model.isSelected == true {
                 self?.progressView.isHidden = false
                 self?.progressView.progress = max(0.1, progress)

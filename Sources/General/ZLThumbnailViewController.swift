@@ -555,12 +555,12 @@ class ZLThumbnailViewController: UIViewController {
                     } else {
                         m.isSelected = true
                         nav.arrSelectedModels.append(m)
-                        config.didSelectAsset?(m.asset)
+                        config.didSelectAsset?(m.asset!)
                     }
                 } else if m.isSelected {
                     m.isSelected = false
                     nav.arrSelectedModels.removeAll { $0 == m }
-                    config.didDeselectAsset?(m.asset)
+                    config.didDeselectAsset?(m.asset!)
                 }
                 
                 cell?.btnSelect.isSelected = m.isSelected
@@ -632,7 +632,7 @@ class ZLThumbnailViewController: UIViewController {
                             selectedArrHasChange = true
                             
                             ZLMainAsync {
-                                config.didDeselectAsset?(m.asset)
+                                config.didDeselectAsset?(m.asset!)
                             }
                         }
                     } else {
@@ -641,7 +641,7 @@ class ZLThumbnailViewController: UIViewController {
                             selectedArrHasChange = true
                             
                             ZLMainAsync {
-                                config.didSelectAsset?(m.asset)
+                                config.didSelectAsset?(m.asset!)
                             }
                         }
                     }
@@ -793,7 +793,8 @@ class ZLThumbnailViewController: UIViewController {
         if config.useCustomCamera {
             let camera = ZLCustomCamera()
             camera.takeDoneBlock = { [weak self] image, videoUrl in
-                self?.save(image: image, videoUrl: videoUrl)
+                guard let self = self else {return}
+                self.save(image: image, videoUrl: videoUrl)
             }
             showDetailViewController(camera, sender: nil)
         } else {
@@ -883,7 +884,7 @@ class ZLThumbnailViewController: UIViewController {
             if !shouldDirectEdit(newModel) {
                 newModel.isSelected = true
                 nav?.arrSelectedModels.append(newModel)
-                config.didSelectAsset?(newModel.asset)
+                config.didSelectAsset?(newModel.asset!)
                 
                 if config.callbackDirectlyAfterTakingPhoto {
                     doneBtnClick()
@@ -919,7 +920,7 @@ class ZLThumbnailViewController: UIViewController {
             }
         }
         
-        requestAssetID = ZLPhotoManager.fetchImage(for: model.asset, size: model.previewSize) { [weak self, weak nav] image, isDegraded in
+        requestAssetID = ZLPhotoManager.fetchImage(for: model.asset!, size: model.previewSize) { [weak self, weak nav] image, isDegraded in
             guard !isDegraded else {
                 return
             }
@@ -930,7 +931,7 @@ class ZLThumbnailViewController: UIViewController {
                     model.editImage = ei
                     model.editImageModel = editImageModel
                     nav?.arrSelectedModels.append(model)
-                    ZLPhotoConfiguration.default().didSelectAsset?(model.asset)
+                    ZLPhotoConfiguration.default().didSelectAsset?(model.asset!)
                     self?.doneBtnClick()
                 }
             } else {
@@ -963,7 +964,7 @@ class ZLThumbnailViewController: UIViewController {
                             let m = ZLPhotoModel(asset: asset)
                             m.isSelected = true
                             nav?.arrSelectedModels.append(m)
-                            config.didSelectAsset?(m.asset)
+                            config.didSelectAsset?(m.asset!)
                             
                             self?.doneBtnClick()
                         } else {
@@ -973,7 +974,7 @@ class ZLThumbnailViewController: UIViewController {
                 } else {
                     model.isSelected = true
                     nav?.arrSelectedModels.append(model)
-                    config.didSelectAsset?(model.asset)
+                    config.didSelectAsset?(model.asset!)
                     
                     self?.doneBtnClick()
                 }
@@ -983,7 +984,7 @@ class ZLThumbnailViewController: UIViewController {
         }
         
         // 提前fetch一下 avasset
-        requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset) { [weak self] avAsset, _ in
+        requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset!) { [weak self] avAsset, _ in
             hud.hide()
             if let avAsset = avAsset {
                 inner_showEditVideoVC(avAsset)
@@ -1101,7 +1102,7 @@ extension ZLThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                         nav?.arrSelectedModels.append(model)
                         block(true)
                         
-                        config.didSelectAsset?(model.asset)
+                        config.didSelectAsset?(model.asset!)
                         self?.refreshCellIndexAndMaskView()
                         
                         if config.maxSelectCount == 1, !config.allowPreviewPhotos {
@@ -1116,7 +1117,7 @@ extension ZLThumbnailViewController: UICollectionViewDataSource, UICollectionVie
                 nav?.arrSelectedModels.removeAll { $0 == model }
                 block(false)
                 
-                config.didDeselectAsset?(model.asset)
+                config.didDeselectAsset?(model.asset!)
                 self?.refreshCellIndexAndMaskView()
                 
                 self?.resetBottomToolBtnStatus()
@@ -1366,7 +1367,7 @@ extension ZLThumbnailViewController: PHPhotoLibraryChangeObserver {
             self.albumList.result = changes.fetchResultAfterChanges
             if changes.hasIncrementalChanges {
                 for sm in nav.arrSelectedModels {
-                    let isDelete = changeInstance.changeDetails(for: sm.asset)?.objectWasDeleted ?? false
+                    let isDelete = changeInstance.changeDetails(for: sm.asset!)?.objectWasDeleted ?? false
                     if isDelete {
                         nav.arrSelectedModels.removeAll { $0 == sm }
                     }
@@ -1378,7 +1379,7 @@ extension ZLThumbnailViewController: PHPhotoLibraryChangeObserver {
                 self.loadPhotos()
             } else {
                 for sm in nav.arrSelectedModels {
-                    let isDelete = changeInstance.changeDetails(for: sm.asset)?.objectWasDeleted ?? false
+                    let isDelete = changeInstance.changeDetails(for: sm.asset!)?.objectWasDeleted ?? false
                     if isDelete {
                         nav.arrSelectedModels.removeAll { $0 == sm }
                     }

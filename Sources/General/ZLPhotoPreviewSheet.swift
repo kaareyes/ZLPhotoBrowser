@@ -632,7 +632,7 @@ public class ZLPhotoPreviewSheet: UIView {
                 if let image = image {
                     let isEdited = m.editImage != nil && !config.saveNewImageAfterEdit
                     let model = ZLResultModel(
-                        asset: asset ?? m.asset,
+                        asset: asset ?? m.asset!,
                         image: image,
                         isEdited: isEdited,
                         editModel: isEdited ? m.editImageModel : nil,
@@ -641,7 +641,7 @@ public class ZLPhotoPreviewSheet: UIView {
                     results[i] = model
                     zl_debugPrint("ZLPhotoBrowser: suc request \(i)")
                 } else {
-                    errorAssets.append(m.asset)
+                    errorAssets.append(m.asset!)
                     errorIndexs.append(i)
                     zl_debugPrint("ZLPhotoBrowser: failed request \(i)")
                 }
@@ -703,7 +703,7 @@ public class ZLPhotoPreviewSheet: UIView {
             }
         }
         
-        requestAssetID = ZLPhotoManager.fetchImage(for: model.asset, size: model.previewSize) { [weak self] image, isDegraded in
+        requestAssetID = ZLPhotoManager.fetchImage(for: model.asset!, size: model.previewSize) { [weak self] image, isDegraded in
             if !isDegraded {
                 if let image = image {
                     ZLEditImageViewController.showEditImageVC(parentVC: self?.sender, image: image, editModel: model.editImageModel) { [weak self] ei, editImageModel in
@@ -711,7 +711,7 @@ public class ZLPhotoPreviewSheet: UIView {
                         model.editImage = ei
                         model.editImageModel = editImageModel
                         self?.arrSelectedModels.append(model)
-                        ZLPhotoConfiguration.default().didSelectAsset?(model.asset)
+                        ZLPhotoConfiguration.default().didSelectAsset?(model.asset!)
                         
                         self?.requestSelectPhoto()
                     }
@@ -756,7 +756,7 @@ public class ZLPhotoPreviewSheet: UIView {
                     self?.arrSelectedModels.removeAll()
                     model.isSelected = true
                     self?.arrSelectedModels.append(model)
-                    config.didSelectAsset?(model.asset)
+                    config.didSelectAsset?(model.asset!)
                     
                     self?.requestSelectPhoto()
                 }
@@ -766,7 +766,7 @@ public class ZLPhotoPreviewSheet: UIView {
         }
         
         // 提前fetch一下 avasset
-        requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset) { [weak self] avAsset, _ in
+        requestAssetID = ZLPhotoManager.fetchAVAsset(forVideo: model.asset!) { [weak self] avAsset, _ in
             hud.hide()
             if let avAsset = avAsset {
                 inner_showEditVideoVC(avAsset)
@@ -841,7 +841,7 @@ public class ZLPhotoPreviewSheet: UIView {
             if !shouldDirectEdit(newModel) {
                 newModel.isSelected = true
                 arrSelectedModels.append(newModel)
-                config.didSelectAsset?(newModel.asset)
+                config.didSelectAsset?(newModel.asset!)
                 
                 if config.callbackDirectlyAfterTakingPhoto {
                     requestSelectPhoto()
@@ -876,8 +876,8 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let m = arrDataSources[indexPath.row]
-        let w = CGFloat(m.asset.pixelWidth)
-        let h = CGFloat(m.asset.pixelHeight)
+        let w = CGFloat(m.asset!.pixelWidth)
+        let h = CGFloat(m.asset!.pixelHeight)
         let scale = min(1.7, max(0.5, w / h))
         return CGSize(width: collectionView.frame.height * scale, height: collectionView.frame.height)
     }
@@ -908,7 +908,7 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
                         self.arrSelectedModels.append(model)
                         block(true)
                         
-                        config.didSelectAsset?(model.asset)
+                        config.didSelectAsset?(model.asset!)
                         self.refreshCellIndex()
                         self.changeCancelBtnTitle()
                     }
@@ -918,7 +918,7 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
                 self.arrSelectedModels.removeAll { $0 == model }
                 block(false)
                 
-                config.didDeselectAsset?(model.asset)
+                config.didDeselectAsset?(model.asset!)
                 self.refreshCellIndex()
                 
                 self.changeCancelBtnTitle()
