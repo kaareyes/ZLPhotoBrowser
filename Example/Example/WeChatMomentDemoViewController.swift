@@ -67,7 +67,7 @@ class WeChatMomentDemoViewController: UIViewController {
         config.allowMixSelect = false
         config.maxSelectCount = 9 - images.count
         config.maxEditVideoTime = 15
-        
+        config.callbackDirectlyAfterTakingPhoto = true
         // You can provide the selected assets so as not to repeat selection.
         // Like this 'let photoPicker = ZLPhotoPreviewSheet(selectedAssets: assets)'
         let photoPicker = ZLPhotoPreviewSheet()

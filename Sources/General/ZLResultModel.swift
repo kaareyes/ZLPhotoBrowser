@@ -41,12 +41,33 @@ public class ZLResultModel: NSObject {
     /// The order in which the user selects the models in the album. This index is not necessarily equal to the order of the model's index in the array, as some PHAssets requests may fail.
     @objc public let index: Int
     
+    @objc public let cameraImage: UIImage?
+    @objc public let url:URL?
+    @objc public let fromCamera:Bool
+
+    
     @objc public init(asset: PHAsset, image: UIImage, isEdited: Bool, editModel: ZLEditImageModel? = nil, index: Int) {
         self.asset = asset
         self.image = image
         self.isEdited = isEdited
         self.editModel = editModel
         self.index = index
+        self.cameraImage = nil
+        self.url = nil
+        self.fromCamera = false
+        super.init()
+    }
+    
+    @objc public init(image: UIImage?,url : URL?,index: Int) {
+        self.asset = PHAsset()
+        self.image = image ?? UIImage()
+        self.isEdited = false
+        self.editModel = nil
+        self.index = index
+        self.cameraImage = image
+        self.url = url
+        self.fromCamera = true
+
         super.init()
     }
 }

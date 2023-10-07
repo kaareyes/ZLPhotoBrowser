@@ -834,8 +834,10 @@ class ZLThumbnailViewController: UIViewController {
         let config = ZLPhotoConfiguration.default()
         
         if config.dontSaveCameraCapture {
+            
             let model = ZLPhotoModel(image: image, url: videoUrl)
             self.handleDataArray(newModel: model)
+            
         }else{
             if let image = image {
                 let hud = ZLProgressHUD.show(toast: .processing)

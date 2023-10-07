@@ -134,7 +134,12 @@ class ZLFetchImageOperation: Operation {
                 }
             }
         } else {
-            requestImageID = ZLPhotoManager.fetchImage(for: model.asset!, size: model.previewSize, progress: progress) { [weak self] image, isDegraded in
+            guard let asset = model.asset else {
+                self.completion(nil, nil)
+                self.fetchFinish()
+                return
+            }
+            requestImageID = ZLPhotoManager.fetchImage(for: asset, size: model.previewSize, progress: progress) { [weak self] image, isDegraded in
                 if !isDegraded {
                     zl_debugPrint("---- 加载完成 isCancelled: \(String(describing: self?.isCancelled))")
                     self?.completion(self?.scaleImage(image?.zl.fixOrientation()), nil)

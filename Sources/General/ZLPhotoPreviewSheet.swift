@@ -624,28 +624,47 @@ public class ZLPhotoPreviewSheet: UIView {
         let totalCount = arrSelectedModels.count
         
         for (i, m) in arrSelectedModels.enumerated() {
-            let operation = ZLFetchImageOperation(model: m, isOriginal: isOriginal) { image, asset in
-                guard !timeout else { return }
-                
-                sucCount += 1
-                
-                if let image = image {
-                    let isEdited = m.editImage != nil && !config.saveNewImageAfterEdit
-                    let model = ZLResultModel(
-                        asset: asset ?? m.asset!,
-                        image: image,
-                        isEdited: isEdited,
-                        editModel: isEdited ? m.editImageModel : nil,
-                        index: i
+            
+            if m.isAsset {
+                let operation = ZLFetchImageOperation(model: m, isOriginal: isOriginal) { image, asset in
+                    guard !timeout else { return }
+                    
+                    sucCount += 1
+                    
+                    if let image = image {
+                        let isEdited = m.editImage != nil && !config.saveNewImageAfterEdit
+                        let model = ZLResultModel(
+                            asset: asset ?? m.asset!,
+                            image: image,
+                            isEdited: isEdited,
+                            editModel: isEdited ? m.editImageModel : nil,
+                            index: i
+                        )
+                        results[i] = model
+                        zl_debugPrint("ZLPhotoBrowser: suc request \(i)")
+                    } else {
+                        errorAssets.append(m.asset!)
+                        errorIndexs.append(i)
+                        zl_debugPrint("ZLPhotoBrowser: failed request \(i)")
+                    }
+                    
+                    guard sucCount >= totalCount else { return }
+                    
+                    callback(
+                        results.compactMap { $0 },
+                        errorAssets,
+                        errorIndexs
                     )
-                    results[i] = model
-                    zl_debugPrint("ZLPhotoBrowser: suc request \(i)")
-                } else {
-                    errorAssets.append(m.asset!)
-                    errorIndexs.append(i)
-                    zl_debugPrint("ZLPhotoBrowser: failed request \(i)")
                 }
-                
+                fetchImageQueue.addOperation(operation)
+
+            }else{
+                sucCount += 1
+
+                if let asset = m.cameraAsset {
+                    let model = ZLResultModel(image: asset.image, url: asset.videoURL, index: i)
+                    results[i] = model
+                }
                 guard sucCount >= totalCount else { return }
                 
                 callback(
@@ -654,7 +673,7 @@ public class ZLPhotoPreviewSheet: UIView {
                     errorIndexs
                 )
             }
-            fetchImageQueue.addOperation(operation)
+            
         }
     }
     

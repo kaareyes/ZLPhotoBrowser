@@ -28,9 +28,13 @@ import UIKit
 import Photos
 
 
-public class ZLCameraAssetMode : NSObject {
+public class ZLCameraAssetModel : NSObject {
     var image : UIImage?
     var videoURL : URL?
+    init(image: UIImage? = nil, videoURL: URL? = nil) {
+        self.image = image
+        self.videoURL = videoURL
+    }
 }
 
 public extension ZLPhotoModel {
@@ -50,7 +54,7 @@ public class ZLPhotoModel: NSObject {
     public var ident: String
     public var isAsset : Bool
     public let asset: PHAsset?
-    public var cameraAsset : ZLCameraAssetMode?
+    public var cameraAsset : ZLCameraAssetModel?
     public var type: ZLPhotoModel.MediaType = .unknown
     
     public var duration: String = ""
@@ -118,6 +122,7 @@ public class ZLPhotoModel: NSObject {
     public init(image : UIImage?, url : URL?) {
         ident =  UUID().uuidString
         isAsset = false
+        self.cameraAsset = ZLCameraAssetModel(image: image, videoURL: url)
         self.asset = nil
         super.init()
     }
