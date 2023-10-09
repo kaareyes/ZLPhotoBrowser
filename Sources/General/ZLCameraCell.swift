@@ -30,7 +30,8 @@ import AVFoundation
 class ZLCameraCell: UICollectionViewCell {
     
     private lazy var imageView: UIImageView = {
-        let view = UIImageView(image: .zl.getImage("zl_takePhoto"))
+        let view = UIImageView(image: .zl.getImage("add-photo"))
+        view.alpha = 0.2
         view.contentMode = .scaleAspectFit
         view.clipsToBounds = true
         return view
@@ -58,6 +59,8 @@ class ZLCameraCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.layer.borderColor = UIColor.green.withAlphaComponent(0.75).cgColor
+        self.layer.borderWidth = 2.5
         setupUI()
     }
     
