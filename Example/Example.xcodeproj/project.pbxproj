@@ -370,7 +370,6 @@
 			children = (
 				FD0FF0D729B726D000660EE9 /* FLAnimatedImage */,
 				FD5EB4CE2A8A01E0005B1BE9 /* Kingfisher */,
-				E4A4109824F39F0000EEC20B /* SnapKit */,
 				FD7274B3286EC79D00FF8CAD /* CustomAlert */,
 				FD7274B6286ECB9D00FF8CAD /* Extension */,
 				E4C911A224E283D80061DA40 /* AppDelegate.swift */,
@@ -386,6 +385,7 @@
 				E4C911AB24E283DA0061DA40 /* Assets.xcassets */,
 				E4C911AD24E283DA0061DA40 /* LaunchScreen.storyboard */,
 				E4C911B024E283DA0061DA40 /* Info.plist */,
+				E4A4109824F39F0000EEC20B /* SnapKit */,
 				E463C1512509FA9500FE1401 /* Example-Bridging-Header.h */,
 			);
 			path = Example;

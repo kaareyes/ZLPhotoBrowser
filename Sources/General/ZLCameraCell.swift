@@ -64,7 +64,7 @@ class ZLCameraCell: UICollectionViewCell {
         setupUI()
     }
     
-    @available(*, unavailable)
+@available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

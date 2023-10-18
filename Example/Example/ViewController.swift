@@ -352,6 +352,11 @@ class ViewController: UIViewController {
         camera.takeDoneBlock = { [weak self] image, videoUrl in
             self?.save(image: image, videoUrl: videoUrl)
         }
+        
+        camera.takeAlbumDoneBlock = { [weak self] results  in
+            guard let self = self else {return }
+        }
+        
         showDetailViewController(camera, sender: nil)
     }
     

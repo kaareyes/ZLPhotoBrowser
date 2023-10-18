@@ -42,7 +42,8 @@ open class ZLCustomCamera: UIViewController {
     }
     
     @objc public var takeDoneBlock: ((UIImage?, URL?) -> Void)?
-    
+    @objc public var takeAlbumDoneBlock: (([ZLResultModel]) -> Void)?
+
     @objc public var cancelBlock: (() -> Void)?
     
     public lazy var tipsLabel: UILabel = {
@@ -140,6 +141,15 @@ open class ZLCustomCamera: UIViewController {
         return btn
     }()
     
+    public lazy var albumBtn: ZLEnlargeButton = {
+        let btn = ZLEnlargeButton(type: .custom)
+        btn.setImage(.zl.getImage("image-gallery"), for: .normal)
+        btn.addTarget(self, action: #selector(albumBtnClick), for: .touchUpInside)
+        btn.adjustsImageWhenHighlighted = false
+        btn.enlargeInset = 30
+        return btn
+    }()
+    
     public lazy var switchCameraBtn: ZLEnlargeButton = {
         let cameraCount = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .unspecified).devices.count
         
@@ -168,6 +178,8 @@ open class ZLCustomCamera: UIViewController {
         view.contentMode = .scaleAspectFit
         return view
     }()
+    
+    
     
     private var hideTipsTimer: Timer?
     
@@ -313,6 +325,12 @@ open class ZLCustomCamera: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         observerDeviceMotion()
+        
+        if !session.isRunning {
+            sessionQueue.async {
+                self.session.startRunning()
+            }
+        }
     }
     
     override open func viewDidAppear(_ animated: Bool) {
@@ -393,8 +411,9 @@ open class ZLCustomCamera: UIViewController {
         let smallCircleH = ZLCustomCamera.Layout.smallCircleRadius
         smallCircleView.frame = CGRect(x: (view.bounds.width - smallCircleH) / 2, y: (ZLCustomCamera.Layout.bottomViewH - smallCircleH) / 2, width: smallCircleH, height: smallCircleH)
         
-        flashBtn.frame = CGRect(x: 60, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+        flashBtn.frame = CGRect(x: 75, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
         switchCameraBtn.frame = CGRect(x: bottomView.zl.width - 60 - 25, y: flashBtn.zl.top, width: 25, height: 25)
+        albumBtn.frame = CGRect(x: 35, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
         
         let tipsTextHeight = (tipsLabel.text ?? " ").zl
             .boundingRect(
@@ -424,6 +443,7 @@ open class ZLCustomCamera: UIViewController {
         view.addSubview(bottomView)
         
         bottomView.addSubview(flashBtn)
+        bottomView.addSubview(albumBtn)
         bottomView.addSubview(largeCircleView)
         bottomView.addSubview(smallCircleView)
         bottomView.addSubview(switchCameraBtn)
@@ -778,6 +798,10 @@ open class ZLCustomCamera: UIViewController {
         flashBtn.isSelected.toggle()
     }
     
+    @objc private func albumBtnClick(){
+        self.openLibrary()
+    }
+    
     @objc private func switchCameraBtnClick() {
         guard !restartRecordAfterSwitchCamera else {
             return
@@ -827,6 +851,26 @@ open class ZLCustomCamera: UIViewController {
                 zl_debugPrint("切换摄像头失败 \(error.localizedDescription)")
             }
         }
+    }
+
+    
+    private func openLibrary(){
+        ZLPhotoConfiguration.default().allowTakePhotoInLibrary = false
+        ZLPhotoConfiguration.default().callbackDirectlyAfterTakingPhoto = true
+        ZLPhotoConfiguration.default().dontSaveCameraCapture = true
+        let ps = ZLPhotoPreviewSheet()
+        ps.selectImageBlock = { [weak self] results, isOriginal in
+            guard let self = self else {return}
+            self.dismiss(animated: true) {
+                self.takeAlbumDoneBlock?(results)
+            }
+        }
+        
+        ps.cancelBlock = {
+   
+        }
+        
+        ps.showPhotoLibrary(sender: self)
     }
     
     private func canEditImage() -> Bool {
