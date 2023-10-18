@@ -411,9 +411,18 @@ open class ZLCustomCamera: UIViewController {
         let smallCircleH = ZLCustomCamera.Layout.smallCircleRadius
         smallCircleView.frame = CGRect(x: (view.bounds.width - smallCircleH) / 2, y: (ZLCustomCamera.Layout.bottomViewH - smallCircleH) / 2, width: smallCircleH, height: smallCircleH)
         
-        flashBtn.frame = CGRect(x: 75, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
         switchCameraBtn.frame = CGRect(x: bottomView.zl.width - 60 - 25, y: flashBtn.zl.top, width: 25, height: 25)
-        albumBtn.frame = CGRect(x: 35, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+
+        
+        
+        
+        if ZLPhotoConfiguration.default().showCameraAlbumOption {
+            albumBtn.frame = CGRect(x: 35, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+            flashBtn.frame = CGRect(x: 75, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+
+        }else{
+            flashBtn.frame = CGRect(x: 60, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+        }
         
         let tipsTextHeight = (tipsLabel.text ?? " ").zl
             .boundingRect(
@@ -443,10 +452,13 @@ open class ZLCustomCamera: UIViewController {
         view.addSubview(bottomView)
         
         bottomView.addSubview(flashBtn)
-        bottomView.addSubview(albumBtn)
         bottomView.addSubview(largeCircleView)
         bottomView.addSubview(smallCircleView)
         bottomView.addSubview(switchCameraBtn)
+        if ZLPhotoConfiguration.default().showCameraAlbumOption {
+            bottomView.addSubview(albumBtn)
+        }
+        
         
         var takePictureTap: UITapGestureRecognizer?
         if cameraConfig.allowTakePhoto {

@@ -276,9 +276,10 @@ public class ZLPhotoConfiguration: NSObject {
     /// The second parameter is the block that needs to be called after the user completes the operation.
     public var operateBeforeDoneAction: ((UIViewController, @escaping () -> Void) -> Void)?
     
-    
-    
     public var dontSaveCameraCapture = true
+    
+    public var showCameraAlbumOption = false
+
 
 }
 
