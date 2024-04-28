@@ -1289,7 +1289,9 @@ extension ZLCustomCamera: AVCapturePhotoCaptureDelegate {
                     self.session.stopRunning()
                     self.resetSubViewStatus()
                 }
-                self.takedImage = UIImage(data: data)?.zl.fixOrientation()
+                if let image = UIImage(data: data)?.zl.fixOrientation() {
+                    self.takedImage = image.croppedToRatio(ratioX: 4, ratioY: 3)
+                }
                 self.takedImageView.image = self.takedImage
                 self.takedImageView.isHidden = false
                 self.editImage()

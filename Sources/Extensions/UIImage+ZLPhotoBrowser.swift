@@ -540,4 +540,21 @@ public extension ZLPhotoBrowserWrapper where Base: CIImage {
         }
         return UIImage(cgImage: cgImage)
     }
+    
+}
+
+public extension UIImage {
+    func croppedToRatio(ratioX: CGFloat, ratioY: CGFloat) -> UIImage? {
+        let originalWidth = size.width
+        let originalHeight = size.height
+        let targetWidth = (originalHeight * ratioX / ratioY <= originalWidth) ? originalHeight * ratioX / ratioY : originalWidth
+        let targetHeight = (originalWidth * ratioY / ratioX <= originalHeight) ? originalWidth * ratioY / ratioX : originalHeight
+        let widthDifference = originalWidth - targetWidth
+        let heightDifference = originalHeight - targetHeight
+        let cropRect = CGRect(x: widthDifference / 2, y: heightDifference / 2, width: targetWidth, height: targetHeight)
+        if let croppedCGImage = self.cgImage?.cropping(to: cropRect) {
+            return UIImage(cgImage: croppedCGImage, scale: self.scale, orientation: self.imageOrientation)
+        }
+        return nil
+    }
 }
