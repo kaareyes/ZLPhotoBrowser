@@ -417,8 +417,8 @@ open class ZLCustomCamera: UIViewController {
         
         
         if ZLPhotoConfiguration.default().showCameraAlbumOption {
-            albumBtn.frame = CGRect(x: 35, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
-            flashBtn.frame = CGRect(x: 75, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+            albumBtn.frame = CGRect(x: 25, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
+            flashBtn.frame = CGRect(x: 95, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
 
         }else{
             flashBtn.frame = CGRect(x: 60, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
