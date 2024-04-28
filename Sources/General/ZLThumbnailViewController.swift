@@ -804,7 +804,7 @@ class ZLThumbnailViewController: UIViewController {
             } else if ZLPhotoManager.hasCameraAuthority() {
                 let picker = UIImagePickerController()
                 picker.delegate = self
-                picker.allowsEditing = false
+                picker.allowsEditing = true
                 picker.videoQuality = .typeHigh
                 picker.sourceType = .camera
                 picker.cameraDevice = config.cameraConfiguration.devicePosition.cameraDevice
