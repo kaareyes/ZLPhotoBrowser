@@ -382,7 +382,7 @@ open class ZLCustomCamera: UIViewController {
             insets = self.view.safeAreaInsets
         }
         
-        let cameraRatio: CGFloat = 16 / 9
+        let cameraRatio: CGFloat = ZLPhotoConfiguration.default().cameraRatio
         let layerH = min(view.zl.width * cameraRatio, view.zl.height)
         
         let previewLayerY: CGFloat
@@ -1288,7 +1288,7 @@ extension ZLCustomCamera: AVCapturePhotoCaptureDelegate {
                     self.resetSubViewStatus()
                 }
                 if let image = UIImage(data: data)?.zl.fixOrientation() {
-                    self.takedImage = image.croppedToRatio(ratioX: 4, ratioY: 3)
+                    self.takedImage = image
                 }
                 self.takedImageView.image = self.takedImage
                 self.takedImageView.isHidden = false

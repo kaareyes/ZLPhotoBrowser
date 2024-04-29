@@ -74,8 +74,9 @@ public class ZLCameraConfiguration: NSObject {
     }
     
     /// Video resolution. Defaults to hd1920x1080.
-    public var sessionPreset: ZLCameraConfiguration.CaptureSessionPreset = .hd1920x1080
-    
+    //  public var sessionPreset: ZLCameraConfiguration.CaptureSessionPreset = .hd1920x1080
+      public var sessionPreset: ZLCameraConfiguration.CaptureSessionPreset = .photo
+
     /// Camera focus mode. Defaults to continuousAutoFocus
     public var focusMode: ZLCameraConfiguration.FocusMode = .continuousAutoFocus
     

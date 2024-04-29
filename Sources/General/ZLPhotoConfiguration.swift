@@ -279,6 +279,7 @@ public class ZLPhotoConfiguration: NSObject {
     public var dontSaveCameraCapture = true
     
     public var showCameraAlbumOption = false
+    public var cameraRatio : CGFloat = 16 / 9
 
 
 }
@@ -288,3 +289,4 @@ public class ZLPhotoConfiguration: NSObject {
     case camera
     case microphone
 }
+

@@ -615,7 +615,7 @@ open class ZLEditImageViewController: UIViewController {
         if isFirstSetContainerFrame,
            presentingViewController is ZLCustomCamera,
            imageRatio < 1 {
-            let cameraRatio: CGFloat = 16 / 9
+            let cameraRatio: CGFloat = ZLPhotoConfiguration.default().cameraRatio
             let layerH = min(view.zl.width * cameraRatio, view.zl.height)
             
             if isSmallScreen() {
