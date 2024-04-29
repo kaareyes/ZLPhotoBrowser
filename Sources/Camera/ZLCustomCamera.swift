@@ -411,11 +411,9 @@ open class ZLCustomCamera: UIViewController {
         let smallCircleH = ZLCustomCamera.Layout.smallCircleRadius
         smallCircleView.frame = CGRect(x: (view.bounds.width - smallCircleH) / 2, y: (ZLCustomCamera.Layout.bottomViewH - smallCircleH) / 2, width: smallCircleH, height: smallCircleH)
         
+        
         switchCameraBtn.frame = CGRect(x: bottomView.zl.width - 60 - 25, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
 
-        
-        
-        
         if ZLPhotoConfiguration.default().showCameraAlbumOption {
             albumBtn.frame = CGRect(x: 25, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)
             flashBtn.frame = CGRect(x: 95, y: (ZLCustomCamera.Layout.bottomViewH - 25) / 2, width: 25, height: 25)

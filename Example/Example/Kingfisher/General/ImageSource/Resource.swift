@@ -52,7 +52,7 @@ extension Resource {
 }
 
 @available(*, deprecated, message: "This type conflicts with `GeneratedAssetSymbols.ImageResource` in Swift 5.9. Renamed to avoid issues in the future.", renamed: "KF.ImageResource")
-public typealias ImageResource = KF.ImageResource
+public typealias KFImageResource = KF.ImageResource
 
 
 extension KF {
