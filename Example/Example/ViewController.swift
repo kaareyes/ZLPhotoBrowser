@@ -29,7 +29,7 @@ class ViewController: UIViewController {
         
         ZLPhotoUIConfiguration.default()
             .customAlertClass(CustomAlertController.self)
-       // ZLPhotoConfiguration.default().cameraRatio = 4 / 3
+        ZLPhotoConfiguration.default().cameraRatio = 4 / 3
     }
     
     func setupUI() {

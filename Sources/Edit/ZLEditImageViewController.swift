@@ -621,11 +621,12 @@ open class ZLEditImageViewController: UIViewController {
             if isSmallScreen() {
                 y = deviceIsFringeScreen() ? min(94, view.zl.height - layerH) : 0
             } else {
-                y = 0
+                y = view.bounds.midY - ((h / 2) + 50)
             }
         } else {
             y = max(0, (scrollViewSize.height - h) / 2)
         }
+        
         
         isFirstSetContainerFrame = false
         

@@ -389,7 +389,7 @@ open class ZLCustomCamera: UIViewController {
         if isSmallScreen() {
             previewLayerY = deviceIsFringeScreen() ? min(94, view.zl.height - layerH) : 0
         } else {
-            previewLayerY = 0
+            previewLayerY = view.bounds.midY - ((layerH / 2) + 50)
         }
         
         let previewFrame = CGRect(x: 0, y: previewLayerY, width: view.bounds.width, height: layerH)
