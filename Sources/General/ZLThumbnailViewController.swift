@@ -325,8 +325,9 @@ class ZLThumbnailViewController: UIViewController {
             let btnY = showLimitAuthTipsView ? ZLLimitedAuthorityTipsView.height + ZLLayout.bottomToolBtnY : ZLLayout.bottomToolBtnY
             let previewTitle = localLanguageTextValue(.preview)
             let previewBtnW = previewTitle.zl.boundingRect(font: ZLLayout.bottomToolTitleFont, limitSize: CGSize(width: CGFloat.greatestFiniteMagnitude, height: 30)).width
-            previewBtn.frame = CGRect(x: 15, y: btnY, width: min(btnMaxWidth, previewBtnW), height: btnH)
-            
+            //previewBtn.frame = CGRect(x: 15, y: btnY, width: min(btnMaxWidth, previewBtnW), height: btnH)
+            previewBtn.translatesAutoresizingMaskIntoConstraints = false
+
             let originalTitle = localLanguageTextValue(.originalPhoto)
             let originBtnW = originalTitle.zl.boundingRect(
                 font: ZLLayout.bottomToolTitleFont,
@@ -337,7 +338,6 @@ class ZLThumbnailViewController: UIViewController {
             ).width + (originalBtn.currentImage?.size.width ?? 19) + 12
             let originBtnMaxW = min(btnMaxWidth, originBtnW)
             originalBtn.frame = CGRect(x: (bottomView.bounds.width - originBtnMaxW) / 2 - 5, y: btnY, width: originBtnMaxW, height: btnH)
-            
             refreshDoneBtnFrame()
         }
     }
@@ -367,9 +367,15 @@ class ZLThumbnailViewController: UIViewController {
         
         bottomView.addSubview(previewBtn)
         bottomView.addSubview(originalBtn)
-        bottomView.addSubview(doneBtn)
-        
+        //bottomView.addSubview(doneBtn)
+        setupAutolayout()
         setupNavView()
+    }
+    
+    private func setupAutolayout(){
+        
+        previewBtn.rightAnchor.constraint(equalTo: bottomView.rightAnchor, constant: -20).isActive = true
+        previewBtn.topAnchor.constraint(equalTo: bottomView.topAnchor, constant: 10).isActive = true
     }
     
     private func setupNavView() {
