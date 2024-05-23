@@ -280,8 +280,7 @@ public class ZLPhotoConfiguration: NSObject {
     
     public var showCameraAlbumOption = false
     public var cameraRatio : CGFloat = 16 / 9
-
-
+    public var photoEditdrawLineWidth : CGFloat = 6.0
 }
 
 @objc public enum ZLNoAuthorityType: Int {

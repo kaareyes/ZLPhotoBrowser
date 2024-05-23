@@ -347,7 +347,7 @@ open class ZLEditImageViewController: UIViewController {
     @objc public lazy var ashbinImgView = UIImageView(image: .zl.getImage("zl_ashbin"), highlightedImage: .zl.getImage("zl_ashbin_open"))
     
     // drawLineWidth
-    @objc public var drawLineWidth: CGFloat = 12
+    @objc public var drawLineWidth: CGFloat = ZLPhotoConfiguration().photoEditdrawLineWidth
     
     @objc public var mosaicLineWidth: CGFloat = 25
     
