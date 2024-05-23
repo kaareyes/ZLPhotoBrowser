@@ -346,7 +346,8 @@ open class ZLEditImageViewController: UIViewController {
     
     @objc public lazy var ashbinImgView = UIImageView(image: .zl.getImage("zl_ashbin"), highlightedImage: .zl.getImage("zl_ashbin_open"))
     
-    @objc public var drawLineWidth: CGFloat = 6
+    // drawLineWidth
+    @objc public var drawLineWidth: CGFloat = 12
     
     @objc public var mosaicLineWidth: CGFloat = 25
     
@@ -1616,6 +1617,7 @@ extension ZLEditImageViewController: UICollectionViewDataSource, UICollectionVie
             cell.icon.isHighlighted = false
             cell.toolType = toolType
             cell.icon.isHighlighted = toolType == selectedTool
+            
             
             return cell
         } else if collectionView == drawColorCollectionView {
