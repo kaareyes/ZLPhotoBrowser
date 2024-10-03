@@ -26,7 +26,7 @@
 
 import Foundation
 
-@objc public enum ZLLanguageType: Int {
+@objc public enum ZLLanguageType: Int, CaseIterable {
     case system
     case chineseSimplified
     case chineseTraditional
@@ -44,6 +44,7 @@ import Foundation
     case spanish
     case turkish
     case arabic
+    case dutch
     
     var key: String {
         var key = "en"
@@ -84,6 +85,8 @@ import Foundation
                 key = "tr"
             } else if key.hasPrefix("ar") {
                 key = "ar"
+            } else if key.hasPrefix("nl") {
+                key = "nl"
             } else {
                 key = "en"
             }
@@ -119,6 +122,8 @@ import Foundation
             key = "tr"
         case .arabic:
             key = "ar"
+        case .dutch:
+            key = "nl"
         }
         
         return key
@@ -156,6 +161,12 @@ public struct ZLLocalLanguageKey: Hashable {
     /// Done (确定)
     public static let done = ZLLocalLanguageKey(rawValue: "done")
     
+    /// Done (确定)
+    public static let cameraDone = ZLLocalLanguageKey(rawValue: "cameraDone")
+    
+    /// Done (确定)
+    public static let inputDone = ZLLocalLanguageKey(rawValue: "inputDone")
+    
     /// OK (确定)
     public static let ok = ZLLocalLanguageKey(rawValue: "ok")
     
@@ -188,6 +199,9 @@ public struct ZLLocalLanguageKey: Hashable {
     
     /// Full Image (原图)
     public static let originalPhoto = ZLLocalLanguageKey(rawValue: "originalPhoto")
+    
+    /// Total (共)
+    public static let originalTotalSize = ZLLocalLanguageKey(rawValue: "originalTotalSize")
     
     /// Back (返回)
     public static let back = ZLLocalLanguageKey(rawValue: "back")

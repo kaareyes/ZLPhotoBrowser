@@ -28,7 +28,6 @@ import UIKit
 import AVFoundation
 
 class ZLCameraCell: UICollectionViewCell {
-    
     private lazy var imageView: UIImageView = {
         let view = UIImageView(image: .zl.getImage("add-photo"))
         view.alpha = 0.2
@@ -45,7 +44,7 @@ class ZLCameraCell: UICollectionViewCell {
     
     private var previewLayer: AVCaptureVideoPreviewLayer?
     
-    var isEnable: Bool = true {
+    var isEnable = true {
         didSet {
             contentView.alpha = isEnable ? 1 : 0.3
         }
@@ -156,5 +155,4 @@ class ZLCameraCell: UICollectionViewCell {
             setupSession()
         }
     }
-    
 }

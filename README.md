@@ -91,28 +91,31 @@ If you only want to use the image edit feature, please move to [ZLImageEditor](h
 ### Change Log
 > [More logs](https://github.com/longitachi/ZLPhotoBrowser/blob/master/CHANGELOG.md)
 ```
-● 4.4.5
+● 4.5.5
   Add:
-    Can set whether the shadow is always displayed when cropping the picture
+    The ZLImagePreviewController interface supports gesture-driven pull-down return animations.
+    Update the API for obtaining album permissions.
   Fix:
-    When there are too many photos, the album may crash when opened.
-    Crash on simulator version 14.0.1.
-    In the image editor where the sticker position was incorrect after the image was rotated.
-● 4.4.4
+    Fixed the bug that mosaics were not displayed during painting.
+● 4.5.4
   Add:
-    Support downloading video data from iCloud before selecting a video.
-    Makes the drawn curves smoother when editing images.
+    Support iOS18.
+    Enhance the user experience of the image cropping interface and optimize the animation effects.
+    Support for setting `VideoMirrored` in the custom camera.
   Fix:
-    Fix a bug that may fail to save videos stored on iCloud.
-● 4.4.3.1, 4.4.3.2 - 4.4.3 Patch
+    Fix the issue where some UI elements are displayed incorrectly on phones without a notch.
+● 4.5.3
+  Add:
+    Support customizing the alert for when there is no permission.
+    Add configuration option to center tools in tools collection view.
   Fix:
-    Delete some time-consuming codes to improve the image loading speed of the thumbnail interface.
-    Disable TextView when user ends editing.
+    Fix the bug where the crop ratio view is not hidden when there is only one ratio in the cropping interface.
+    Fix a bug that may cause failure when saving images from iCloud to local storage.
 ...
 ```
 
 ### Languages
-🇨🇳 Chinese, 🇺🇸 English, 🇯🇵 Japanese, 🇫🇷 French, 🇩🇪 German, 🇷🇺 Russian, 🇻🇳 Vietnamese, 🇰🇷 Korean, 🇲🇾 Malay, 🇮🇹 Italian, 🇮🇩 Indonesian, 🇪🇸 Spanish, 🇵🇹 Portuguese, 🇹🇷 Turkish, 🇸🇦 Arabic.
+🇨🇳 Chinese, 🇺🇸 English, 🇯🇵 Japanese, 🇫🇷 French, 🇩🇪 German, 🇷🇺 Russian, 🇻🇳 Vietnamese, 🇰🇷 Korean, 🇲🇾 Malay, 🇮🇹 Italian, 🇮🇩 Indonesian, 🇪🇸 Spanish, 🇵🇹 Portuguese, 🇹🇷 Turkish, 🇸🇦 Arabic, 🇳🇱 Dutch.
 
 ### Installation
 There are four ways to use ZLPhotoBrowser in your project:
@@ -162,8 +165,8 @@ If you get an error like `Building universal frameworks with common architecture
 Rebuild with --use-xcframeworks to create an xcframework bundle instead.` [Click this link](https://github.com/Carthage/Carthage/blob/master/Documentation/Xcode12Workaround.md).
 
 #### Swift Package Manager
-1. Select File > Swift Packages > Add Package Dependency. Enter https://github.com/longitachi/ZLPhotoBrowser.git in the "Choose Package Repository" dialog.
-2. In the next page, specify the version resolving rule as "Up to Next Major" with "4.0.9" as its earliest version.
+1. Select File > Add Packages. Enter https://github.com/longitachi/ZLPhotoBrowser.git in the "Choose Package Repository" dialog.
+2. In the next page, specify the version resolving rule as "Up to Next Major" with "4.5.5" as its earliest version.
 3. After Xcode checking out the source and resolving the version, you can choose the "ZLPhotoBrowser" library and add it to your app target.
 
 ### Support

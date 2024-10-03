@@ -44,7 +44,7 @@ enum ZLLayout {
 }
 
 func markSelected(source: inout [ZLPhotoModel], selected: inout [ZLPhotoModel]) {
-    guard selected.count > 0 else {
+    guard !selected.isEmpty else {
         return
     }
     
@@ -104,7 +104,7 @@ func deviceSafeAreaInsets() -> UIEdgeInsets {
 }
 
 func deviceIsFringeScreen() -> Bool {
-    return deviceSafeAreaInsets().top > 0
+    return deviceSafeAreaInsets().top > 20
 }
 
 func isSmallScreen() -> Bool {
@@ -161,7 +161,7 @@ func canAddModel(_ model: ZLPhotoModel, currentSelectCount: Int, sender: UIViewC
     
     if currentSelectCount > 0,
        !config.allowMixSelect,
-       model.type == .video{
+       model.type == .video {
         return false
     }
     
@@ -185,7 +185,7 @@ func canAddModel(_ model: ZLPhotoModel, currentSelectCount: Int, sender: UIViewC
         return false
     }
     
-    guard (config.minSelectVideoDataSize > 0 || config.maxSelectVideoDataSize != .greatestFiniteMagnitude),
+    guard config.minSelectVideoDataSize > 0 || config.maxSelectVideoDataSize != .greatestFiniteMagnitude,
           let size = model.dataSize else {
         return true
     }
@@ -221,7 +221,7 @@ func downloadAssetIfNeed(model: ZLPhotoModel, sender: UIViewController?, complet
     }
 
     var requestAssetID: PHImageRequestID?
-    let hud = ZLProgressHUD.show(timeout: config.timeout)
+    let hud = ZLProgressHUD.show(timeout: ZLPhotoUIConfiguration.default().timeout)
     hud.timeoutBlock = { [weak sender] in
         showAlertView(localLanguageTextValue(.timeout), sender)
         if let requestAssetID = requestAssetID {
@@ -250,7 +250,7 @@ func videoIsMeetRequirements(model: ZLPhotoModel) -> Bool {
         return false
     }
     
-    if (config.minSelectVideoDataSize > 0 || config.maxSelectVideoDataSize != .greatestFiniteMagnitude),
+    if config.minSelectVideoDataSize > 0 || config.maxSelectVideoDataSize != .greatestFiniteMagnitude,
        let dataSize = model.dataSize,
        !(config.minSelectVideoDataSize...config.maxSelectVideoDataSize ~= dataSize) {
         return false
@@ -276,7 +276,7 @@ func ZLMainAsync(after: TimeInterval = 0, handler: @escaping (() -> Void)) {
 }
 
 func zl_debugPrint(_ message: Any...) {
-    message.forEach { debugPrint($0) }
+//    message.forEach { debugPrint($0) }
 }
 
 func zlLoggerInDebug(_ lastMessage: @autoclosure () -> String, file: StaticString = #file, line: UInt = #line) {

@@ -33,6 +33,8 @@ class ZLInputTextViewController: UIViewController {
     
     private var text: String
     
+    private var font: UIFont = .boldSystemFont(ofSize: ZLTextStickerView.fontSize)
+    
     private var currentColor: UIColor {
         didSet {
             refreshTextViewUI()
@@ -41,9 +43,23 @@ class ZLInputTextViewController: UIViewController {
     
     private var textStyle: ZLInputTextStyle
     
+    private lazy var bgImageView: UIImageView = {
+        let view = UIImageView(image: image?.zl.blurImage(level: 4))
+        view.contentMode = .scaleAspectFit
+        return view
+    }()
+    
+    private lazy var coverView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .black
+        view.alpha = 0.4
+        return view
+    }()
+    
     private lazy var cancelBtn: UIButton = {
         let btn = UIButton(type: .custom)
         btn.setTitle(localLanguageTextValue(.cancel), for: .normal)
+        btn.setTitleColor(.zl.bottomToolViewDoneBtnNormalTitleColor, for: .normal)
         btn.titleLabel?.font = ZLLayout.bottomToolTitleFont
         btn.addTarget(self, action: #selector(cancelBtnClick), for: .touchUpInside)
         return btn
@@ -51,7 +67,7 @@ class ZLInputTextViewController: UIViewController {
     
     private lazy var doneBtn: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle(localLanguageTextValue(.done), for: .normal)
+        btn.setTitle(localLanguageTextValue(.inputDone), for: .normal)
         btn.titleLabel?.font = ZLLayout.bottomToolTitleFont
         btn.setTitleColor(.zl.bottomToolViewDoneBtnNormalTitleColor, for: .normal)
         btn.backgroundColor = .zl.bottomToolViewBtnNormalBgColor
@@ -62,8 +78,7 @@ class ZLInputTextViewController: UIViewController {
     }()
     
     private lazy var textView: UITextView = {
-        let y = max(deviceSafeAreaInsets().top, 20) + 20 + ZLLayout.bottomToolBtnH + 12
-        let textView = UITextView(frame: CGRect(x: 10, y: y, width: view.zl.width - 20, height: 200))
+        let textView = UITextView()
         textView.keyboardAppearance = .dark
         textView.returnKeyType = .done
         textView.delegate = self
@@ -71,7 +86,7 @@ class ZLInputTextViewController: UIViewController {
         textView.tintColor = .zl.bottomToolViewBtnNormalBgColor
         textView.textColor = currentColor
         textView.text = text
-        textView.font = .boldSystemFont(ofSize: ZLTextStickerView.fontSize)
+        textView.font = font
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         textView.textContainer.lineFragmentPadding = 0
         textView.layoutManager.delegate = self
@@ -112,6 +127,8 @@ class ZLInputTextViewController: UIViewController {
         return collectionView
     }()
     
+    private var shouldLayout = true
+    
     private lazy var textLayer = CAShapeLayer()
     
     private let textLayerRadius: CGFloat = 10
@@ -119,10 +136,10 @@ class ZLInputTextViewController: UIViewController {
     private let maxTextCount = 100
     
     /// text, textColor, image, style
-    var endInput: ((String, UIColor, UIImage?, ZLInputTextStyle) -> Void)?
+    var endInput: ((String, UIColor, UIFont, UIImage?, ZLInputTextStyle) -> Void)?
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
+        deviceIsiPhone() ? .portrait : .all
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -133,9 +150,12 @@ class ZLInputTextViewController: UIViewController {
         zl_debugPrint("ZLInputTextViewController deinit")
     }
     
-    init(image: UIImage?, text: String? = nil, textColor: UIColor? = nil, style: ZLInputTextStyle = .normal) {
+    init(image: UIImage?, text: String? = nil, textColor: UIColor? = nil, font: UIFont? = nil, style: ZLInputTextStyle = .normal) {
         self.image = image
         self.text = text ?? ""
+        if let font = font {
+            self.font = font.withSize(ZLTextStickerView.fontSize)
+        }
         if let textColor = textColor {
             currentColor = textColor
         } else {
@@ -146,7 +166,7 @@ class ZLInputTextViewController: UIViewController {
                 currentColor = editConfig.textStickerDefaultTextColor
             }
         }
-        self.textStyle = style
+        textStyle = style
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -172,12 +192,34 @@ class ZLInputTextViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        let btnY = max(deviceSafeAreaInsets().top, 20) + 20
+        guard shouldLayout else { return }
+        
+        shouldLayout = false
+        bgImageView.frame = view.bounds
+        
+        // iPad图片由竖屏切换到横屏时候填充方式会有点异常，这里重置下
+        if deviceIsiPad() {
+            if UIApplication.shared.statusBarOrientation.isLandscape {
+                bgImageView.contentMode = .scaleAspectFill
+            } else {
+                bgImageView.contentMode = .scaleAspectFit
+            }
+        }
+        
+        coverView.frame = bgImageView.bounds
+        
+        let btnY = max(deviceSafeAreaInsets().top, 20)
         let cancelBtnW = localLanguageTextValue(.cancel).zl.boundingRect(font: ZLLayout.bottomToolTitleFont, limitSize: CGSize(width: .greatestFiniteMagnitude, height: ZLLayout.bottomToolBtnH)).width + 20
         cancelBtn.frame = CGRect(x: 15, y: btnY, width: cancelBtnW, height: ZLLayout.bottomToolBtnH)
         
-        let doneBtnW = localLanguageTextValue(.done).zl.boundingRect(font: ZLLayout.bottomToolTitleFont, limitSize: CGSize(width: .greatestFiniteMagnitude, height: ZLLayout.bottomToolBtnH)).width + 20
+        let doneBtnW = (doneBtn.currentTitle ?? "")
+            .zl.boundingRect(
+                font: ZLLayout.bottomToolTitleFont,
+                limitSize: CGSize(width: .greatestFiniteMagnitude, height: ZLLayout.bottomToolBtnH)
+            ).width + 20
         doneBtn.frame = CGRect(x: view.zl.width - 20 - doneBtnW, y: btnY, width: doneBtnW, height: ZLLayout.bottomToolBtnH)
+        
+        textView.frame = CGRect(x: 10, y: doneBtn.zl.bottom + 30, width: view.zl.width - 20, height: 200)
         
         textStyleBtn.frame = CGRect(
             x: 12,
@@ -197,25 +239,25 @@ class ZLInputTextViewController: UIViewController {
         }
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        shouldLayout = true
+    }
+    
     private func setupUI() {
         view.backgroundColor = .black
         
-        let bgImageView = UIImageView(image: image?.zl.blurImage(level: 4))
-        bgImageView.frame = view.bounds
-        bgImageView.contentMode = .scaleAspectFit
         view.addSubview(bgImageView)
-        
-        let coverView = UIView(frame: bgImageView.bounds)
-        coverView.backgroundColor = .black
-        coverView.alpha = 0.4
         bgImageView.addSubview(coverView)
-        
         view.addSubview(cancelBtn)
         view.addSubview(doneBtn)
         view.addSubview(textView)
         view.addSubview(toolView)
         toolView.addSubview(textStyleBtn)
         toolView.addSubview(collectionView)
+        
+        // 这个要放到这里，不能放到懒加载里，因为放到懒加载里会触发layoutManager(_:, didCompleteLayoutFor:,atEnd)，导致循环调用
+        textView.textAlignment = .left
         
         refreshTextViewUI()
     }
@@ -264,21 +306,18 @@ class ZLInputTextViewController: UIViewController {
             for subview in textView.subviews {
                 if NSStringFromClass(subview.classForCoder) == "_UITextContainerView" {
                     let size = textView.sizeThatFits(subview.frame.size)
-                    UIGraphicsBeginImageContextWithOptions(size, false, UIScreen.main.scale)
-                    if let context = UIGraphicsGetCurrentContext() {
+                    image = UIGraphicsImageRenderer.zl.renderImage(size: size) { context in
                         if textStyle == .bg {
                             textLayer.render(in: context)
                         }
-                        
+
                         subview.layer.render(in: context)
-                        image = UIGraphicsGetImageFromCurrentImageContext()
-                        UIGraphicsEndImageContext()
                     }
                 }
             }
         }
         
-        endInput?(textView.text, currentColor, image, textStyle)
+        endInput?(textView.text, currentColor, font, image, textStyle)
         dismiss(animated: true, completion: nil)
     }
     
@@ -408,7 +447,7 @@ extension ZLInputTextViewController {
     private func calculateTextRects() -> [CGRect] {
         let layoutManager = textView.layoutManager
         
-        // 这里必须用utf16.count 或者 (text as NSString).length，因为用count的话不准，一个emoji表情的count为2
+        // 这里必须用utf16.count 或者 (text as NSString).length，因为用count的话不准，一个emoji表情的count为2或更大
         let range = layoutManager.glyphRange(forCharacterRange: NSMakeRange(0, textView.text.utf16.count), actualCharacterRange: nil)
         let glyphRange = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
         

@@ -4,9 +4,12 @@
 "cancel" = "Cancel";
 
 "originalPhoto" = "Full Image";
+"originalTotalSize" = "Total";
 "done" = "Done";
 "ok" = "OK";
 "editFinish" = "Done";
+"cameraDone" = "Done";
+"inputDone" = "Done";
 
 "back" = "Back";
 "edit" = "Edit";

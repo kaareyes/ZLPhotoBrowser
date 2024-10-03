@@ -30,6 +30,12 @@ import UIKit
 
 public extension ZLPhotoUIConfiguration {
     @discardableResult
+    func sortAscending(_ ascending: Bool) -> ZLPhotoUIConfiguration {
+        sortAscending = ascending
+        return self
+    }
+    
+    @discardableResult
     func style(_ style: ZLPhotoBrowserStyle) -> ZLPhotoUIConfiguration {
         self.style = style
         return self
@@ -123,6 +129,60 @@ public extension ZLPhotoUIConfiguration {
     @discardableResult
     func showIndexOnSelectBtn(_ value: Bool) -> ZLPhotoUIConfiguration {
         showIndexOnSelectBtn = value
+        return self
+    }
+    
+    @discardableResult
+    func showScrollToBottomBtn(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showScrollToBottomBtn = value
+        return self
+    }
+    
+    @discardableResult
+    func showCaptureImageOnTakePhotoBtn(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showCaptureImageOnTakePhotoBtn = value
+        return self
+    }
+    
+    @discardableResult
+    func showSelectedMask(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showSelectedMask = value
+        return self
+    }
+    
+    @discardableResult
+    func showSelectedBorder(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showSelectedBorder = value
+        return self
+    }
+    
+    @discardableResult
+    func showInvalidMask(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showInvalidMask = value
+        return self
+    }
+    
+    @discardableResult
+    func showSelectedPhotoPreview(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showSelectedPhotoPreview = value
+        return self
+    }
+    
+    @discardableResult
+    func showAddPhotoButton(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showAddPhotoButton = value
+        return self
+    }
+    
+    @discardableResult
+    func showEnterSettingTips(_ value: Bool) -> ZLPhotoUIConfiguration {
+        showEnterSettingTips = value
+        return self
+    }
+    
+    @discardableResult
+    func timeout(_ timeout: TimeInterval) -> ZLPhotoUIConfiguration {
+        self.timeout = timeout
         return self
     }
     
@@ -291,6 +351,18 @@ public extension ZLPhotoUIConfiguration {
     @discardableResult
     func bottomToolViewBgColorOfPreviewVC(_ color: UIColor) -> ZLPhotoUIConfiguration {
         bottomToolViewBgColorOfPreviewVC = color
+        return self
+    }
+    
+    @discardableResult
+    func originalSizeLabelTextColor(_ color: UIColor) -> ZLPhotoUIConfiguration {
+        originalSizeLabelTextColor = color
+        return self
+    }
+    
+    @discardableResult
+    func originalSizeLabelTextColorOfPreviewVC(_ color: UIColor) -> ZLPhotoUIConfiguration {
+        originalSizeLabelTextColorOfPreviewVC = color
         return self
     }
     

@@ -4,9 +4,12 @@
 "cancel" = "Membatalkan";
 
 "originalPhoto" = "Gambar Penuh";
+"originalTotalSize" = "Total";
 "done" = "Selesai";
 "ok" = "Oke";
 "editFinish" = "Selesai";
+"cameraDone" = "Selesai";
+"inputDone" = "Selesai";
 
 "back" = "Kembali";
 "edit" = "Edit";

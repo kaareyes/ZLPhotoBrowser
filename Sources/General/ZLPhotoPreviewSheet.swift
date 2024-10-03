@@ -28,7 +28,6 @@ import UIKit
 import Photos
 
 public class ZLPhotoPreviewSheet: UIView {
-    
     private enum Layout {
         static let colH: CGFloat = 155
         
@@ -124,7 +123,11 @@ public class ZLPhotoPreviewSheet: UIView {
     
     private weak var sender: UIViewController?
     
-    private lazy var fetchImageQueue = OperationQueue()
+    private lazy var fetchImageQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.maxConcurrentOperationCount = 3
+        return queue
+    }()
     
     /// Success callback
     /// block params
@@ -193,7 +196,6 @@ public class ZLPhotoPreviewSheet: UIView {
             config.allowSelectImage = true
         }
         
-        fetchImageQueue.maxConcurrentOperationCount = 3
         setupUI()
     }
     
@@ -323,7 +325,7 @@ public class ZLPhotoPreviewSheet: UIView {
         self.animate = animate
         self.sender = sender
         
-        let status = PHPhotoLibrary.authorizationStatus()
+        let status = PHPhotoLibrary.zl.authStatus(for: .readWrite)
         if status == .restricted || status == .denied {
             showNoAuthorityAlert()
         } else if status == .notDetermined {
@@ -354,19 +356,18 @@ public class ZLPhotoPreviewSheet: UIView {
         }
         
         // Register for the album change notification when the status is limited, because the photoLibraryDidChange method will be repeated multiple times each time the album changes, causing the interface to refresh multiple times. So the album changes are not monitored in other authority.
-        if #available(iOS 14.0, *), preview, PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited {
+        if #available(iOS 14.0, *), preview, PHPhotoLibrary.zl.authStatus(for: .readWrite) == .limited {
             PHPhotoLibrary.shared().register(self)
         }
     }
     
     private func loadPhotos() {
-        arrDataSources.removeAll()
-        
         let config = ZLPhotoConfiguration.default()
         ZLPhotoManager.getCameraRollAlbum(allowSelectImage: config.allowSelectImage, allowSelectVideo: config.allowSelectVideo) { [weak self] cameraRoll in
             guard let `self` = self else { return }
             var totalPhotos = ZLPhotoManager.fetchPhoto(in: cameraRoll.result, ascending: false, allowSelectImage: config.allowSelectImage, allowSelectVideo: config.allowSelectVideo, limitCount: config.maxPreviewCount)
             markSelected(source: &totalPhotos, selected: &self.arrSelectedModels)
+            self.arrDataSources.removeAll()
             self.arrDataSources.append(contentsOf: totalPhotos)
             self.collectionView.reloadData()
         }
@@ -423,10 +424,15 @@ public class ZLPhotoPreviewSheet: UIView {
     }
     
     private func showNoAuthorityAlert() {
+        if let customAlertWhenNoAuthority = ZLPhotoConfiguration.default().customAlertWhenNoAuthority {
+            customAlertWhenNoAuthority(.library)
+            return
+        }
+        
         let action = ZLCustomAlertAction(title: localLanguageTextValue(.ok), style: .default) { _ in
             ZLPhotoConfiguration.default().noAuthorityCallback?(.library)
         }
-        showAlertController(title: nil, message: String(format: localLanguageTextValue(.noPhotoLibratyAuthority), getAppName()), style: .alert, actions: [action], sender: self.sender)
+        showAlertController(title: nil, message: String(format: localLanguageTextValue(.noPhotoLibratyAuthority), getAppName()), style: .alert, actions: [action], sender: sender)
     }
     
     @objc private func tapAction(_ tap: UITapGestureRecognizer) {
@@ -580,7 +586,7 @@ public class ZLPhotoPreviewSheet: UIView {
             }
         }
         
-        let hud = ZLProgressHUD.show(toast: .processing, timeout: ZLPhotoConfiguration.default().timeout)
+        let hud = ZLProgressHUD.show(toast: .processing, timeout: ZLPhotoUIConfiguration.default().timeout)
         
         var timeout = false
         hud.timeoutBlock = { [weak self] in
@@ -714,7 +720,7 @@ public class ZLPhotoPreviewSheet: UIView {
     private func showEditImageVC(model: ZLPhotoModel) {
         var requestAssetID: PHImageRequestID?
         
-        let hud = ZLProgressHUD.show(timeout: ZLPhotoConfiguration.default().timeout)
+        let hud = ZLProgressHUD.show(timeout: ZLPhotoUIConfiguration.default().timeout)
         hud.timeoutBlock = { [weak self] in
             showAlertView(localLanguageTextValue(.timeout), self?.sender)
             if let requestAssetID = requestAssetID {
@@ -746,7 +752,7 @@ public class ZLPhotoPreviewSheet: UIView {
         let config = ZLPhotoConfiguration.default()
         var requestAssetID: PHImageRequestID?
         
-        let hud = ZLProgressHUD.show(timeout: config.timeout)
+        let hud = ZLProgressHUD.show(timeout: ZLPhotoUIConfiguration.default().timeout)
         hud.timeoutBlock = { [weak self] in
             showAlertView(localLanguageTextValue(.timeout), self?.sender)
             if let requestAssetID = requestAssetID {
@@ -870,29 +876,25 @@ public class ZLPhotoPreviewSheet: UIView {
         }
         
         let insertIndexPath = IndexPath(row: 0, section: 0)
-        collectionView.performBatchUpdates({
+        collectionView.performBatchUpdates {
             self.collectionView.insertItems(at: [insertIndexPath])
-        }) { _ in
+        } completion: { _ in
             self.collectionView.scrollToItem(at: insertIndexPath, at: .centeredHorizontally, animated: true)
             self.collectionView.reloadItems(at: self.collectionView.indexPathsForVisibleItems)
         }
         
         changeCancelBtnTitle()
     }
-    
 }
 
 extension ZLPhotoPreviewSheet: UIGestureRecognizerDelegate {
-    
     override public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         let location = gestureRecognizer.location(in: self)
         return !baseView.frame.contains(location)
     }
-    
 }
 
 extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let m = arrDataSources[indexPath.row]
         let w = CGFloat(m.asset!.pixelWidth)
@@ -945,8 +947,8 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
         }
         
         if config.showSelectedIndex,
-           let index = arrSelectedModels.firstIndex(where: { $0 == model }){
-            setCellIndex(cell, showIndexLabel: true, index: index + 1)
+           let index = arrSelectedModels.firstIndex(where: { $0 == model }) {
+            setCellIndex(cell, showIndexLabel: true, index: index + config.initialIndex)
         } else {
             cell.indexLabel.isHidden = true
         }
@@ -976,7 +978,7 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
             return
         }
         
-        if !cell.enableSelect, ZLPhotoConfiguration.default().showInvalidMask {
+        if !cell.enableSelect, ZLPhotoUIConfiguration.default().showInvalidMask {
             return
         }
         let model = arrDataSources[indexPath.row]
@@ -984,7 +986,9 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
         if shouldDirectEdit(model) {
             return
         }
+        
         let config = ZLPhotoConfiguration.default()
+        let uiConfig = ZLPhotoUIConfiguration.default()
         let hud = ZLProgressHUD.show()
         
         ZLPhotoManager.getCameraRollAlbum(allowSelectImage: config.allowSelectImage, allowSelectVideo: config.allowSelectVideo) { [weak self] cameraRoll in
@@ -996,12 +1000,17 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
                 return
             }
             
-            var totalPhotos = ZLPhotoManager.fetchPhoto(in: cameraRoll.result, ascending: config.sortAscending, allowSelectImage: config.allowSelectImage, allowSelectVideo: config.allowSelectVideo)
+            var totalPhotos = ZLPhotoManager.fetchPhoto(
+                in: cameraRoll.result,
+                ascending: uiConfig.sortAscending,
+                allowSelectImage: config.allowSelectImage,
+                allowSelectVideo: config.allowSelectVideo
+            )
             markSelected(source: &totalPhotos, selected: &self.arrSelectedModels)
-            let defaultIndex = config.sortAscending ? totalPhotos.count - 1 : 0
+            let defaultIndex = uiConfig.sortAscending ? totalPhotos.count - 1 : 0
             var index: Int?
             // last和first效果一样，只是排序方式不同时候分别从前后开始查找可以更快命中
-            if config.sortAscending {
+            if uiConfig.sortAscending {
                 index = totalPhotos.lastIndex { $0 == model }
             } else {
                 index = totalPhotos.firstIndex { $0 == model }
@@ -1051,12 +1060,14 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
     
     private func refreshCellIndex() {
         let config = ZLPhotoConfiguration.default()
+        let uiConfig = ZLPhotoUIConfiguration.default()
+        
         let cameraIsEnable = arrSelectedModels.count < config.maxSelectCount
         cameraBtn.alpha = cameraIsEnable ? 1 : 0.3
         cameraBtn.isEnabled = cameraIsEnable
         
         let showIndex = config.showSelectedIndex
-        let showMask = config.showSelectedMask || config.showInvalidMask
+        let showMask = uiConfig.showSelectedMask || uiConfig.showInvalidMask
         
         guard showIndex || showMask else {
             return
@@ -1076,7 +1087,7 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
             for (index, selM) in arrSelectedModels.enumerated() {
                 if m == selM {
                     show = true
-                    idx = index + 1
+                    idx = index + config.initialIndex
                     isSelected = true
                     break
                 }
@@ -1094,11 +1105,12 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
         cell.coverView.isHidden = true
         cell.enableSelect = true
         let config = ZLPhotoConfiguration.default()
+        let uiConfig = ZLPhotoUIConfiguration.default()
         
         if isSelected {
             cell.coverView.backgroundColor = .zl.selectedMaskColor
-            cell.coverView.isHidden = !config.showSelectedMask
-            if config.showSelectedBorder {
+            cell.coverView.isHidden = !uiConfig.showSelectedMask
+            if uiConfig.showSelectedBorder {
                 cell.layer.borderWidth = 4
             }
         } else {
@@ -1108,31 +1120,31 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
                     let videoCount = arrSelectedModels.filter { $0.type == .video }.count
                     if videoCount >= config.maxVideoSelectCount, model.type == .video {
                         cell.coverView.backgroundColor = .zl.invalidMaskColor
-                        cell.coverView.isHidden = !config.showInvalidMask
+                        cell.coverView.isHidden = !uiConfig.showInvalidMask
                         cell.enableSelect = false
                     } else if (config.maxSelectCount - selCount) <= (config.minVideoSelectCount - videoCount), model.type != .video {
                         cell.coverView.backgroundColor = .zl.invalidMaskColor
-                        cell.coverView.isHidden = !config.showInvalidMask
+                        cell.coverView.isHidden = !uiConfig.showInvalidMask
                         cell.enableSelect = false
                     }
                 } else if selCount > 0 {
                     cell.coverView.backgroundColor = .zl.invalidMaskColor
-                    cell.coverView.isHidden = (!config.showInvalidMask || model.type != .video)
+                    cell.coverView.isHidden = (!uiConfig.showInvalidMask || model.type != .video)
                     cell.enableSelect = model.type != .video
                 }
             } else if selCount >= config.maxSelectCount {
                 cell.coverView.backgroundColor = .zl.invalidMaskColor
-                cell.coverView.isHidden = !config.showInvalidMask
+                cell.coverView.isHidden = !uiConfig.showInvalidMask
                 cell.enableSelect = false
             }
-            if config.showSelectedBorder {
+            if uiConfig.showSelectedBorder {
                 cell.layer.borderWidth = 0
             }
         }
     }
     
     private func changeCancelBtnTitle() {
-        if arrSelectedModels.count > 0 {
+        if !arrSelectedModels.isEmpty {
             cancelBtn.setTitle(String(format: "%@(%ld)", localLanguageTextValue(.done), arrSelectedModels.count), for: .normal)
             cancelBtn.setTitleColor(.zl.previewBtnHighlightTitleColor, for: .normal)
         } else {
@@ -1140,10 +1152,12 @@ extension ZLPhotoPreviewSheet: UICollectionViewDataSource, UICollectionViewDeleg
             cancelBtn.setTitleColor(.zl.previewBtnTitleColor, for: .normal)
         }
     }
-    
 }
 
 extension ZLPhotoPreviewSheet: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
     
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         picker.dismiss(animated: true) {
@@ -1152,16 +1166,13 @@ extension ZLPhotoPreviewSheet: UIImagePickerControllerDelegate, UINavigationCont
             self.save(image: image, videoUrl: url)
         }
     }
-    
 }
 
 extension ZLPhotoPreviewSheet: PHPhotoLibraryChangeObserver {
-    
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
         ZLMainAsync {
             self.loadPhotos()
         }
     }
-    
 }

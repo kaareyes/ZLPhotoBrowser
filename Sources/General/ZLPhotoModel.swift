@@ -38,7 +38,6 @@ public class ZLCameraAssetModel : NSObject {
 }
 
 public extension ZLPhotoModel {
-    
     enum MediaType: Int {
         case unknown = 0
         case image
@@ -46,23 +45,17 @@ public extension ZLPhotoModel {
         case livePhoto
         case video
     }
-    
 }
 
 public class ZLPhotoModel: NSObject {
-    
     public var ident: String
     public var isAsset : Bool
     public let asset: PHAsset?
     public var cameraAsset : ZLCameraAssetModel?
     public var type: ZLPhotoModel.MediaType = .unknown
-    
-    public var duration: String = ""
-    
-    public var isSelected: Bool = false
-    
+    public var duration = ""
+    public var isSelected = false
     private var pri_dataSize: ZLPhotoConfiguration.KBUnit?
-    
     public var dataSize: ZLPhotoConfiguration.KBUnit? {
         guard let asset = self.asset else {return 0.0}
         if let pri_dataSize = pri_dataSize {
@@ -177,13 +170,10 @@ public class ZLPhotoModel: NSObject {
             return ""
         }
     }
-    
 }
 
 public extension ZLPhotoModel {
-    
-    static func ==(lhs: ZLPhotoModel, rhs: ZLPhotoModel) -> Bool {
+    static func == (lhs: ZLPhotoModel, rhs: ZLPhotoModel) -> Bool {
         return lhs.ident == rhs.ident
     }
-    
 }
